@@ -1,0 +1,28 @@
+{
+  "name": "BACKEND",
+  "version": "1.0.0",
+  "dependencies": {
+    "@sap/cds": "^10"
+  },
+  "devDependencies": {
+    "@cap-js/sqlite": "^3"
+  },
+  "scripts": {
+    "start": "cds-serve"
+  },
+  "cds": {
+    "model": [
+      "db",
+      "srv"
+    ],
+    "requires": {
+      "db": {
+        "kind": "sqlite",
+        "credentials": {
+          "url": "workforce360V2.db"
+        }
+      }
+    }
+  },
+  "private": true
+}

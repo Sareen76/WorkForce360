@@ -1,0 +1,10 @@
+{
+    "sqltools.connections": [
+        {
+            "previewLimit": 50,
+            "driver": "SQLite",
+            "name": "workforce360V2",
+            "database": "${workspaceFolder:Workforce360}/BACKEND/workforce360V2.db"
+        }
+    ]
+}

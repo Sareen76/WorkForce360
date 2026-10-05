@@ -1,0 +1,284 @@
+### =========================================================
+### Workforce360 - Search & Filters With Authorization
+### =========================================================
+
+@host = http://localhost:4004/odata/v4/workforce
+
+@hradmin = hradmin
+@manager = manager
+@employee = employee
+
+### =========================================================
+### ACTIVE EMPLOYEES
+### =========================================================
+
+GET {{host}}/Employees?$filter=status eq 'ACTIVE'
+Authorization: Basic {{hradmin}}:
+
+###
+
+GET {{host}}/Employees?$filter=status eq 'ACTIVE'
+Authorization: Basic {{manager}}:
+
+###
+
+GET {{host}}/Employees?$filter=status eq 'ACTIVE'
+Authorization: Basic {{employee}}:
+
+### =========================================================
+### STATUS FILTERS
+### =========================================================
+
+GET {{host}}/Employees?$filter=status eq 'PROBATION'
+Authorization: Basic {{manager}}:
+
+###
+
+GET {{host}}/Employees?$filter=status eq 'ON_LEAVE'
+Authorization: Basic {{manager}}:
+
+###
+
+GET {{host}}/Employees?$filter=status eq 'RESIGNED'
+Authorization: Basic {{manager}}:
+
+### =========================================================
+### SEARCH
+### =========================================================
+
+GET {{host}}/Employees?$filter=employeeId eq 'EMP001'
+Authorization: Basic {{manager}}:
+
+###
+
+GET {{host}}/Employees?$filter=firstName eq 'Sareen'
+Authorization: Basic {{manager}}:
+
+###
+
+GET {{host}}/Employees?$filter=lastName eq 'Garnaik'
+Authorization: Basic {{manager}}:
+
+###
+
+GET {{host}}/Employees?$filter=email eq 'sareen@workforce360.com'
+Authorization: Basic {{manager}}:
+
+###
+
+GET {{host}}/Employees?$filter=designation eq 'Software Engineer'
+Authorization: Basic {{manager}}:
+
+### =========================================================
+### PARTIAL SEARCH
+### =========================================================
+
+GET {{host}}/Employees?$filter=contains(firstName,'Sar')
+Authorization: Basic {{manager}}:
+
+###
+
+GET {{host}}/Employees?$filter=contains(lastName,'Gar')
+Authorization: Basic {{manager}}:
+
+###
+
+GET {{host}}/Employees?$filter=contains(designation,'Engineer')
+Authorization: Basic {{manager}}:
+
+###
+
+GET {{host}}/Employees?$filter=contains(email,'workforce360')
+Authorization: Basic {{manager}}:
+
+### =========================================================
+### DEPARTMENT FILTERS
+### =========================================================
+
+GET {{host}}/Employees?$expand=department
+Authorization: Basic {{manager}}:
+
+###
+
+GET {{host}}/Employees?$expand=department&$filter=department/name eq 'Engineering'
+Authorization: Basic {{manager}}:
+
+###
+
+GET {{host}}/Employees?$expand=department&$filter=department/name eq 'HR'
+Authorization: Basic {{manager}}:
+
+###
+
+GET {{host}}/Employees?$expand=department&$filter=department/name eq 'Finance'
+Authorization: Basic {{manager}}:
+
+###
+
+GET {{host}}/Employees?$expand=department&$filter=department/name eq 'Sales'
+Authorization: Basic {{manager}}:
+
+### =========================================================
+### JOINING DATE FILTERS
+### =========================================================
+
+GET {{host}}/Employees?$filter=joiningDate gt 2025-12-31
+Authorization: Basic {{manager}}:
+
+###
+
+GET {{host}}/Employees?$filter=joiningDate lt 2026-01-01
+Authorization: Basic {{manager}}:
+
+###
+
+GET {{host}}/Employees?$filter=joiningDate ge 2026-01-01 and joiningDate le 2026-12-31
+Authorization: Basic {{manager}}:
+
+### =========================================================
+### SALARY FILTERS
+### =========================================================
+
+GET {{host}}/Employees?$filter=salary gt 500000
+Authorization: Basic {{manager}}:
+
+###
+
+GET {{host}}/Employees?$filter=salary lt 1000000
+Authorization: Basic {{manager}}:
+
+###
+
+GET {{host}}/Employees?$filter=salary ge 500000 and salary le 1000000
+Authorization: Basic {{manager}}:
+
+### =========================================================
+### COMBINED FILTERS
+### =========================================================
+
+GET {{host}}/Employees?$filter=status eq 'ACTIVE' and joiningDate gt 2025-12-31
+Authorization: Basic {{manager}}:
+
+###
+
+GET {{host}}/Employees?$expand=department&$filter=status eq 'ACTIVE' and department/name eq 'Engineering'
+Authorization: Basic {{manager}}:
+
+###
+
+GET {{host}}/Employees?$expand=department&$filter=status eq 'ON_LEAVE' and department/name eq 'Engineering'
+Authorization: Basic {{manager}}:
+
+###
+
+GET {{host}}/Employees?$expand=department&$filter=status eq 'ACTIVE' and department/name eq 'Engineering' and joiningDate gt 2025-12-31
+Authorization: Basic {{manager}}:
+
+### =========================================================
+### SORTING
+### =========================================================
+
+GET {{host}}/Employees?$orderby=salary asc
+Authorization: Basic {{manager}}:
+
+###
+
+GET {{host}}/Employees?$orderby=salary desc
+Authorization: Basic {{manager}}:
+
+###
+
+GET {{host}}/Employees?$orderby=firstName asc
+Authorization: Basic {{manager}}:
+
+###
+
+GET {{host}}/Employees?$orderby=firstName desc
+Authorization: Basic {{manager}}:
+
+###
+
+GET {{host}}/Employees?$orderby=joiningDate desc
+Authorization: Basic {{manager}}:
+
+### =========================================================
+### PAGINATION
+### =========================================================
+
+GET {{host}}/Employees?$top=5
+Authorization: Basic {{manager}}:
+
+###
+
+GET {{host}}/Employees?$skip=5&$top=5
+Authorization: Basic {{manager}}:
+
+###
+
+GET {{host}}/Employees?$orderby=firstName asc&$top=10
+Authorization: Basic {{manager}}:
+
+### =========================================================
+### EXPAND RELATIONSHIPS
+### =========================================================
+
+GET {{host}}/Employees?$expand=department
+Authorization: Basic {{manager}}:
+
+###
+
+GET {{host}}/Departments?$expand=employees
+Authorization: Basic {{hradmin}}:
+
+### =========================================================
+### NEGATIVE AUTHORIZATION TESTS
+### =========================================================
+
+### Employee trying to create employee (Should Fail 403)
+
+POST {{host}}/Employees
+Authorization: Basic {{employee}}:
+Content-Type: application/json
+
+{
+  "employeeId":"EMP900",
+  "firstName":"Test",
+  "lastName":"User",
+  "email":"test@example.com",
+  "salary":10000,
+  "status":"ACTIVE"
+}
+
+###
+
+### Manager trying to create employee (Should Fail 403)
+
+POST {{host}}/Employees
+Authorization: Basic {{manager}}:
+Content-Type: application/json
+
+{
+  "employeeId":"EMP901",
+  "firstName":"Manager",
+  "lastName":"User",
+  "email":"manager@example.com",
+  "salary":10000,
+  "status":"ACTIVE"
+}
+
+###
+
+### HR Admin creating employee (Should Pass)
+
+POST {{host}}/Employees
+Authorization: Basic {{hradmin}}:
+Content-Type: application/json
+
+{
+  "employeeId":"EMP902",
+  "firstName":"HR",
+  "lastName":"Admin",
+  "email":"hradmin@example.com",
+  "salary":10000,
+  "status":"ACTIVE"
+}

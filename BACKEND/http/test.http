@@ -1,21 +1,28 @@
 ### =========================================================
 ### Workforce360 - Sprint 1 API Test Collection
-### Base URL
 ### =========================================================
 
 @host = http://localhost:4004/odata/v4/workforce
+
+### =========================================================
+### USERS
+### =========================================================
+
+@hradmin = hradmin
+@manager = manager
+@employee = employee
 
 ### =========================================================
 ### SERVICE ROOT
 ### =========================================================
 
 GET {{host}}
+Authorization: Basic {{hradmin}}:
 
-### =========================================================
-### METADATA
-### =========================================================
+###
 
 GET {{host}}/$metadata
+Authorization: Basic {{hradmin}}:
 
 ### =========================================================
 ### DEPARTMENTS
@@ -23,132 +30,334 @@ GET {{host}}/$metadata
 
 ### Get All Departments
 GET {{host}}/Departments
+Authorization: Basic {{hradmin}}:
 
 ###
 
-### Get Department By ID
-GET {{host}}/Departments(11111111-1111-1111-1111-111111111111)
-
-###
-
-### Create Department
+### Create Engineering Department
 POST {{host}}/Departments
+Authorization: Basic {{hradmin}}:
 Content-Type: application/json
 
 {
-    "name": "Engineering",
-    "description": "Engineering Team",
-    "location": "Bangalore"
+  "name": "Engineering",
+  "description": "Engineering Team",
+  "location": "Bangalore"
 }
 
 ###
 
 ### Create HR Department
 POST {{host}}/Departments
+Authorization: Basic {{hradmin}}:
 Content-Type: application/json
 
 {
-    "name": "HR",
-    "description": "Human Resources Department",
-    "location": "Hyderabad"
+  "name": "HR",
+  "description": "Human Resources Department",
+  "location": "Hyderabad"
 }
 
 ###
 
-### Update Department
-PATCH {{host}}/Departments(11111111-1111-1111-1111-111111111111)
-Content-Type: application/json
-
-{
-    "location": "Chennai"
-}
-
-###
-
-### Delete Department
-DELETE {{host}}/Departments(11111111-1111-1111-1111-111111111111)
+### Get All Departments As Manager
+GET {{host}}/Departments
+Authorization: Basic {{manager}}:
 
 ### =========================================================
-### EMPLOYEES
+### EMPLOYEES - HR ADMIN
 ### =========================================================
-
-### Get All Employees
-GET {{host}}/Employees
-
-###
-
-### Get Employee By UUID
-GET {{host}}/Employees(22222222-2222-2222-2222-222222222222)
-
-###
 
 ### Create Employee
 POST {{host}}/Employees
+Authorization: Basic {{hradmin}}:
 Content-Type: application/json
 
 {
-    "employeeId": "EMP001",
-    "firstName": "Sareen",
-    "lastName": "Garnaik",
-    "email": "sareen@workforce360.com",
-    "phone": "9876543210",
-    "designation": "Software Engineer",
-    "salary": 800000,
-    "joiningDate": "2026-01-01",
-    "status": "ACTIVE",
-    "department_ID": "11111111-1111-1111-1111-111111111111"
+  "employeeId": "EMP001",
+  "firstName": "Sareen",
+  "lastName": "Garnaik",
+  "email": "sareen@workforce360.com",
+  "phone": "9876543210",
+  "designation": "Software Engineer",
+  "salary": 800000,
+  "joiningDate": "2026-01-01",
+  "status": "ACTIVE"
 }
 
 ###
 
-### Create Second Employee
+### Create Employee 2
 POST {{host}}/Employees
+Authorization: Basic {{hradmin}}:
 Content-Type: application/json
 
 {
-    "employeeId": "EMP002",
-    "firstName": "John",
-    "lastName": "Doe",
-    "email": "john@workforce360.com",
-    "phone": "9999999999",
-    "designation": "HR Specialist",
-    "salary": 700000,
-    "joiningDate": "2025-05-10",
-    "status": "ACTIVE",
-    "department_ID": "11111111-1111-1111-1111-111111111111"
+  "employeeId": "EMP002",
+  "firstName": "John",
+  "lastName": "Doe",
+  "email": "john@workforce360.com",
+  "phone": "9999999999",
+  "designation": "HR Specialist",
+  "salary": 700000,
+  "joiningDate": "2025-05-10",
+  "status": "ACTIVE"
 }
 
 ###
 
-### Update Employee Designation
-PATCH {{host}}/Employees(22222222-2222-2222-2222-222222222222)
+### Get All Employees
+GET {{host}}/Employees
+Authorization: Basic {{hradmin}}:
+
+###
+
+### Update Designation
+PATCH {{host}}/Employees(<EMPLOYEE_UUID>)
+Authorization: Basic {{hradmin}}:
 Content-Type: application/json
 
 {
-    "designation": "Senior Software Engineer"
+  "designation": "Senior Software Engineer"
 }
 
 ###
 
-### Update Employee Salary
-PATCH {{host}}/Employees(22222222-2222-2222-2222-222222222222)
+### Update Salary
+PATCH {{host}}/Employees(<EMPLOYEE_UUID>)
+Authorization: Basic {{hradmin}}:
 Content-Type: application/json
 
 {
-    "salary": 1200000
+  "salary": 1200000
 }
 
 ###
 
-### Update Employee Status
-PATCH {{host}}/Employees(22222222-aaaa-bbbb-cccc-222222222222)
+### Update Status
+PATCH {{host}}/Employees(<EMPLOYEE_UUID>)
+Authorization: Basic {{hradmin}}:
 Content-Type: application/json
 
 {
-    "status": "PROBATION"
+  "status": "PROBATION"
 }
 
 ###
 
 ### Delete Employee
-DELETE {{host}}/Employees(22222222
+DELETE {{host}}/Employees(<EMPLOYEE_UUID>)
+Authorization: Basic {{hradmin}}:
+
+### =========================================================
+### EMPLOYEES - MANAGER
+### =========================================================
+
+### Manager Can View Employees
+GET {{host}}/Employees
+Authorization: Basic {{manager}}:
+
+###
+
+### Manager Search ACTIVE Employees
+GET {{host}}/Employees?$filter=status eq 'ACTIVE'
+Authorization: Basic {{manager}}:
+
+###
+
+### Manager Search Engineers
+GET {{host}}/Employees?$filter=contains(designation,'Engineer')
+Authorization: Basic {{manager}}:
+
+###
+
+### Manager Create Employee (Should Fail)
+POST {{host}}/Employees
+Authorization: Basic {{manager}}:
+Content-Type: application/json
+
+{
+  "employeeId": "EMP100",
+  "firstName": "Manager",
+  "lastName": "Test",
+  "email": "manager@test.com",
+  "salary": 50000,
+  "status": "ACTIVE"
+}
+
+### =========================================================
+### EMPLOYEE
+### =========================================================
+
+### Employee View Employees
+GET {{host}}/Employees
+Authorization: Basic {{employee}}:
+
+###
+
+### Employee Create Employee (Should Fail)
+POST {{host}}/Employees
+Authorization: Basic {{employee}}:
+Content-Type: application/json
+
+{
+  "employeeId": "EMP200",
+  "firstName": "Employee",
+  "lastName": "Test",
+  "email": "employee@test.com",
+  "salary": 50000,
+  "status": "ACTIVE"
+}
+
+### =========================================================
+### FILTERS
+### =========================================================
+
+### Active Employees
+GET {{host}}/Employees?$filter=status eq 'ACTIVE'
+Authorization: Basic {{hradmin}}:
+
+###
+
+### Probation Employees
+GET {{host}}/Employees?$filter=status eq 'PROBATION'
+Authorization: Basic {{hradmin}}:
+
+###
+
+### Resigned Employees
+GET {{host}}/Employees?$filter=status eq 'RESIGNED'
+Authorization: Basic {{hradmin}}:
+
+###
+
+### Joining Date After 2025
+GET {{host}}/Employees?$filter=joiningDate gt 2025-12-31
+Authorization: Basic {{hradmin}}:
+
+### =========================================================
+### SEARCH
+### =========================================================
+
+### Employee ID
+GET {{host}}/Employees?$filter=employeeId eq 'EMP001'
+Authorization: Basic {{hradmin}}:
+
+###
+
+### Email
+GET {{host}}/Employees?$filter=email eq 'sareen@workforce360.com'
+Authorization: Basic {{hradmin}}:
+
+###
+
+### First Name
+GET {{host}}/Employees?$filter=firstName eq 'Sareen'
+Authorization: Basic {{hradmin}}:
+
+###
+
+### Contains First Name
+GET {{host}}/Employees?$filter=contains(firstName,'Sar')
+Authorization: Basic {{hradmin}}:
+
+###
+
+### Designation Contains Engineer
+GET {{host}}/Employees?$filter=contains(designation,'Engineer')
+Authorization: Basic {{hradmin}}:
+
+### =========================================================
+### SORTING
+### =========================================================
+
+GET {{host}}/Employees?$orderby=salary asc
+Authorization: Basic {{hradmin}}:
+
+###
+
+GET {{host}}/Employees?$orderby=salary desc
+Authorization: Basic {{hradmin}}:
+
+###
+
+GET {{host}}/Employees?$orderby=firstName asc
+Authorization: Basic {{hradmin}}:
+
+### =========================================================
+### PAGINATION
+### =========================================================
+
+GET {{host}}/Employees?$top=5
+Authorization: Basic {{hradmin}}:
+
+###
+
+GET {{host}}/Employees?$skip=5&$top=5
+Authorization: Basic {{hradmin}}:
+
+### =========================================================
+### NEGATIVE TESTS
+### =========================================================
+
+### Duplicate Employee ID
+POST {{host}}/Employees
+Authorization: Basic {{hradmin}}:
+Content-Type: application/json
+
+{
+  "employeeId": "EMP001",
+  "firstName": "Duplicate",
+  "lastName": "User",
+  "email": "duplicate@test.com",
+  "salary": 50000,
+  "status": "ACTIVE"
+}
+
+###
+
+### Duplicate Email
+POST {{host}}/Employees
+Authorization: Basic {{hradmin}}:
+Content-Type: application/json
+
+{
+  "employeeId": "EMP999",
+  "firstName": "Duplicate",
+  "lastName": "Email",
+  "email": "sareen@workforce360.com",
+  "salary": 50000,
+  "status": "ACTIVE"
+}
+
+###
+
+### Invalid Salary
+POST {{host}}/Employees
+Authorization: Basic {{hradmin}}:
+Content-Type: application/json
+
+{
+  "employeeId": "EMP888",
+  "firstName": "Bad",
+  "lastName": "Salary",
+  "email": "badsalary@test.com",
+  "salary": -1000,
+  "status": "ACTIVE"
+}
+
+###
+
+### Invalid Enum Status
+POST {{host}}/Employees
+Authorization: Basic {{hradmin}}:
+Content-Type: application/json
+
+{
+  "employeeId": "EMP777",
+  "firstName": "Wrong",
+  "lastName": "Status",
+  "email": "wrongstatus@test.com",
+  "salary": 50000,
+  "status": "active"
+}

@@ -1,0 +1,1 @@
+using WorkforceService as service from '../../srv/workforce-service';
